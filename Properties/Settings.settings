@@ -1,0 +1,18 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Splitter.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="InputFolder" Type="System.String" Scope="User">
+      <Value Profile="(Default)">C:\DataFolder\BigInput</Value>
+    </Setting>
+    <Setting Name="FileNamePrefix" Type="System.String" Scope="User">
+      <Value Profile="(Default)">page</Value>
+    </Setting>
+    <Setting Name="HTMLExtension" Type="System.String" Scope="User">
+      <Value Profile="(Default)">htm</Value>
+    </Setting>
+    <Setting Name="OutputFolder" Type="System.String" Scope="User">
+      <Value Profile="(Default)">C:\DataFolder\BigOutput</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
