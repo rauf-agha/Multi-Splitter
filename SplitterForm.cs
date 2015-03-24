@@ -215,7 +215,7 @@ namespace Splitter
                     GeneratePagesFromBookFile(bookFile, bookLanguage);                                  
 
                     //copy static files (css/js/img etc.) to very own folder for each book per language
-                    CopyAllStaticFoldersAndFiles(m_staticFolder, Path.Combine(m_outputFolder, bookLanguage, bookName));
+                    CopyAllStaticFoldersAndFiles(m_staticFolder, Path.Combine(m_outputFolder, bookLanguage, bookName.Replace(" ", "-")));
                 }                
             }            
 
@@ -246,7 +246,8 @@ namespace Splitter
                 Directory.CreateDirectory(Path.Combine(m_outputFolder, bookLanguage));
             }
 
-            MainBookTextProcessing(Path.GetFileNameWithoutExtension(bookFileName), bookLanguage);
+            string outBookName = Path.GetFileNameWithoutExtension(bookFileName.Replace(" ", "-"));
+            MainBookTextProcessing(outBookName, bookLanguage);
         }
 
         private List<String> GetListOfAllBooks(string languageFolder)
@@ -274,12 +275,9 @@ namespace Splitter
                 //subSections[0] only will be used for naming file
                 string[] subSections = m_sections[sectionNumber].Split(new char[] { '\r', '\n' });
 
-                string fileSectionName = CleanFileName(subSections[0], bookLanguageName);
-                
+                string fileSectionName = CleanFileName(subSections[0], bookLanguageName);                
 
-                string prefixPart = m_fileNamePrefix + sectionNumber; //e.g. page1
-
-                bookName = bookName.Replace(" ", "-");
+                string prefixPart = m_fileNamePrefix + sectionNumber; //e.g. page1                
                 String outputBookFolder = Path.Combine(m_outputFolder, bookLanguageName, bookName);
                 if (!Directory.Exists(outputBookFolder))
                 {
