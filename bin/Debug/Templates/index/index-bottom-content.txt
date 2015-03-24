@@ -1,0 +1,47 @@
+﻿
+</div>
+<!------------------>
+<div data-role="footer" data-theme="a" data-position="fixed">
+<div data-role="navbar" data-theme="a">
+<ul>
+<li><a href="http://www.Allah.com" rel="external" data-icon="star" data-iconpos="top" data-theme="a">About</a></li>
+<li><a href="market://search?q=pub:muhammadcom" data-icon="star" data-iconpos="top" data-theme="a">More books</a></li>
+<li><a href="http://www.Muhammad.com" rel="external" data-icon="star" data-iconpos="top" data-theme="a">About the Author </a></li>
+</ul>
+</div><!-- /navbar -->
+</div>
+</div><!-- End of Page-->
+<script type="text/javascript">
+function resizeText(multiplier) {
+if (document.body.style.fontSize == "") {
+document.body.style.fontSize = "1.0em";
+}
+document.body.style.fontSize = parseFloat(document.body.style.fontSize) + (multiplier * 0.2) + "em";
+}
+</script>
+<script>
+document.addEventListener("deviceready", onDeviceReady, false);
+function onDeviceReady() {
+document.addEventListener("backbutton", onBackKeyDown, false); //Listen to the User clicking on the back button
+}
+function onBackKeyDown(e) {
+e.preventDefault();
+navigator.notification.confirm("Wanna to exit?", onConfirm, "confirm", "yes,no"); 
+// Prompt the user with the choice
+}
+function onConfirm(button) {
+if(button==2){//If User selected No, then we just do nothing
+return;
+}else{
+navigator.app.exitApp();// Otherwise we quit the app.
+}
+}
+</script>
+<script type="text/javascript" src="cordova.js"></script>
+<script src="js/jquery.js"></script>
+<script src="js/jquery.mobile-1.4.0-rc.1.js"></script> 
+<script type="text/javascript">
+app.initialize();
+</script>
+</body>
+</html>

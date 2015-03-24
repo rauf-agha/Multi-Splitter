@@ -1,0 +1,6 @@
+﻿
+// middle filling for rauf to fill
+// for each page1.html thru last pageN+1 entry   
+
+<a data-role="button" href="page1.html" rel="external" data-transition="flip" data-theme="a">enjoy current section in your language</a>
+

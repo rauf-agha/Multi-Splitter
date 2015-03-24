@@ -126,18 +126,15 @@ namespace Splitter
         /// </summary>
         private void LoadBookFile(string bookFileName)
         {
-            if (bookFileName == "") return;
-            //var kvp = (KeyValuePair<string, int>)encodingListComboBox.SelectedItem;
-            //int encodingPage = kvp.Value;
-            //isHTMLRTL = kvp.Key.Contains("Arabic") || kvp.Key.Contains("Hebrew");
+            if (bookFileName == "") return;            
 
             String wholeFileText;
-            using (TextReader reader = new StreamReader(bookFileName, Encoding.UTF8))//Encoding.GetEncoding(encodingPage)
+            using (TextReader reader = new StreamReader(bookFileName, Encoding.UTF8))
             {
                 wholeFileText = reader.ReadToEnd();
             }
 
-            //clear memory from last book
+            //.NET GC is kind but still clear memory from last book
             if (m_sections != null && m_sections.Length > 0)
             {
                 Array.Clear(m_sections, 0, m_sections.Length);    
@@ -158,6 +155,7 @@ namespace Splitter
                 var combinedLines = new StringBuilder();
                 for (int i = 0; i < lines.Length; i++)
                 {
+                    //once N lines are read, save them as one section in sections LIST<string>
                     if ((i + 1) % (m_LineCountToCombine + 1) == 0)
                     {
                         sections.Add(combinedLines.ToString());
@@ -216,7 +214,7 @@ namespace Splitter
                     //generate book pages from this book file                    
                     GeneratePagesFromBookFile(bookFile, bookLanguage);                                  
 
-                    //copy static files (css/js/img etc.) to very own folder for each book
+                    //copy static files (css/js/img etc.) to very own folder for each book per language
                     CopyAllStaticFoldersAndFiles(m_staticFolder, Path.Combine(m_outputFolder, bookLanguage, bookName));
                 }                
             }            
@@ -269,29 +267,17 @@ namespace Splitter
         {
             TextWriter textWriterFile;            
             string TOCIndexFileName = "";
-            for (int i = 0; i < m_sections.Length; i++)
+            for (int sectionNumber = 0; sectionNumber < m_sections.Length; sectionNumber++)
             {
 
                 // to be used in HTML pages
                 //subSections[0] only will be used for naming file
-                string[] subSections = m_sections[i].Split(new char[] { '\r', '\n' });
+                string[] subSections = m_sections[sectionNumber].Split(new char[] { '\r', '\n' });
 
-                string fileSectionName = CleanFileName(subSections[0]);
-                if (bookLanguageName.Equals("english", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
-                    fileSectionName = textInfo.ToTitleCase(fileSectionName.ToLower()); 
-                }
+                string fileSectionName = CleanFileName(subSections[0], bookLanguageName);
+                
 
-                string prefixPart = "";
-                //if (i < 10)
-                //    prefixPart = m_fileNamePrefix + "000" + i;
-                //else if (i < 100)
-                //    prefixPart = m_fileNamePrefix + "00" + i;
-                //else if (i < 1000)
-                //    prefixPart = m_fileNamePrefix + "0" + i;
-                //else
-                    prefixPart = m_fileNamePrefix + i;
+                string prefixPart = m_fileNamePrefix + sectionNumber; //e.g. page1
 
                 bookName = bookName.Replace(" ", "-");
                 String outputBookFolder = Path.Combine(m_outputFolder, bookLanguageName, bookName);
@@ -299,63 +285,90 @@ namespace Splitter
                 {
                     Directory.CreateDirectory(outputBookFolder);
                 }
-                String outFileNamePath = i == 0 ? Path.Combine(outputBookFolder, m_IndexFileName) : 
-                                       Path.Combine(outputBookFolder, prefixPart + "." + m_fileExtension);
+
+                // e.g. C:\OutData\Arabic\index.html or C:\OutData\Arabic\Page1.html
+                String outFileNamePath = (sectionNumber == 0) ? Path.Combine(outputBookFolder, m_IndexFileName) : 
+                                                  Path.Combine(outputBookFolder, prefixPart + "." + m_fileExtension);
                 
                 if (outFileNamePath.Length >= 256)
                 {
                     outFileNamePath = outFileNamePath.Substring(0, 255);
                 }
-                textWriterFile = new StreamWriter(outFileNamePath, false, Encoding.UTF8); //Encoding.GetEncoding(65001)
+                textWriterFile = new StreamWriter(outFileNamePath, false, Encoding.UTF8); 
 
-                if (i == 0) // save TOC (index) file name
+                if (sectionNumber == 0) // save TOC (index) file name
                 {
                     TOCIndexFileName = outFileNamePath;
                 }
-                else // insert topic file names and page links in the TOC (index) file
+                else // append topic file names and page links in the TOC (index) file
                 {
-                    using (StreamWriter writerTOC = new StreamWriter(TOCIndexFileName, true, Encoding.UTF8))
+                    using (StreamWriter writerTOC = new StreamWriter(TOCIndexFileName, append: true, encoding: Encoding.UTF8))
                     {
-                        string strLinkText = String.Format("{0}.{1}", prefixPart, m_fileExtension);
-                        writerTOC.WriteLine(String.Format("<a href='{0}'>{0}</a> ({1})<br/>", strLinkText, fileSectionName));
+                        string pageLinkText = String.Format("{0}.{1}", prefixPart, m_fileExtension);
+                        writerTOC.WriteLine("<a data-role='button' href='" + pageLinkText + "' rel='external' data-transition='flip' data-theme='a'> " + 
+                                                fileSectionName + "</a>");
                         writerTOC.Close();
                     }
                 }
 
                 if (chkHTML.Checked)
                 {
-                    WriteHTMLStructure(textWriterFile, TOCIndexFileName, i, subSections);
+                    WriteHTMLStructure(textWriterFile, TOCIndexFileName, sectionNumber, subSections);
                 }
 
                 else
                 { // only text files
-                    textWriterFile.WriteLine(m_sections[i]);
+                    textWriterFile.WriteLine(m_sections[sectionNumber]);
+                    textWriterFile.Close();
                 }
 
-                textWriterFile.Close();
+                
             }
         }
 
-        private void WriteHTMLStructure(TextWriter textWriterFile, string TOCIndexFileName, int sectionNumber, string[] subSections)
+        private void WriteHTMLStructure(TextWriter textWriterHtml, string TOCIndexFileName, int sectionNumber, string[] subSections)
         {
-            if (isHTMLRTL)
+            
+            //a. top section
+            if (sectionNumber == 0) //index file
             {
-                textWriterFile.Write(@"<html dir=""rtl"">");
+                textWriterHtml.WriteLine(File.ReadAllText(@"Templates\index\index-top-content.txt"));
             }
             else
             {
-                textWriterFile.Write("<html>");
-            }
-            textWriterFile.WriteLine(@"<head> 
+                //normal pages, TBD according to template
+                if (isHTMLRTL)
+                {
+                    textWriterHtml.Write(@"<html dir=""rtl"">");
+                }
+                else
+                {
+                    textWriterHtml.Write("<html>");
+                }
+                textWriterHtml.WriteLine(@"<head> 
                                            <meta content=""text/html; charset=UTF-8"" http-equiv=""content-type"">
                                            <meta name=""viewport"" content=""width=device-width, initial-scale=1, maximum-scale=1"">
                                            <title>Muhammad.com</title>
                                     </head>
                                     <body>");
+            }
 
-            WriteHTMLBodyContent(textWriterFile, TOCIndexFileName, sectionNumber, subSections);
+            //b. middle content section
+            WriteHTMLBodyContent(textWriterHtml, TOCIndexFileName, sectionNumber, subSections);
 
-            textWriterFile.WriteLine("</body></html>");
+
+
+            //c. bottom section
+            if (sectionNumber != 0)
+            {
+                textWriterHtml.WriteLine("</body></html>");
+            }
+            else //index file
+            {
+                textWriterHtml.WriteLine(File.ReadAllText(@"Templates\index\index-bottom-content.txt"));
+            }
+            
+            textWriterHtml.Close();
         }
 
         private static void WriteHTMLBodyContent(TextWriter tr, string TOCIndexFileName, int sectionNumber, string[] subSections)
@@ -376,10 +389,9 @@ namespace Splitter
                 tr.WriteLine("<br/> <a href='" + Path.GetFileName(TOCIndexFileName) + "'>Home</a> <br/>"); // Link to Home- TOC file at bottom
         }
 
-        private string CleanFileName(string fileName)
+        private string CleanFileName(string fileName, string languageName)
         {
-            if (fileName == null || fileName.Length == 0)
-                return "";
+            if (fileName == null || fileName.Length == 0) return "";
 
             var sb = new StringBuilder();
             foreach (char c in fileName)
@@ -389,7 +401,15 @@ namespace Splitter
                     sb.Append(c);
                 }
             }
-            return sb.ToString().Trim();
+
+            string fileSectionName = sb.ToString().Trim();
+            if (languageName.Equals("english", StringComparison.InvariantCultureIgnoreCase))
+            {
+                TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
+                fileSectionName = textInfo.ToTitleCase(fileSectionName.ToLower());
+            }
+
+            return fileSectionName;
         }
 
       
