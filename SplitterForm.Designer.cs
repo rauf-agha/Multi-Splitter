@@ -42,8 +42,6 @@
             this.bgWorker2 = new System.ComponentModel.BackgroundWorker();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.label3 = new System.Windows.Forms.Label();
-            this.encodingListComboBox = new System.Windows.Forms.ComboBox();
             this.lnkSplitOutFolder = new System.Windows.Forms.LinkLabel();
             this.chkHTML = new System.Windows.Forms.CheckBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
@@ -126,8 +124,6 @@
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.label3);
-            this.groupBox1.Controls.Add(this.encodingListComboBox);
             this.groupBox1.Controls.Add(this.lnkSplitOutFolder);
             this.groupBox1.Controls.Add(this.chkHTML);
             this.groupBox1.Controls.Add(this.groupBox2);
@@ -146,23 +142,6 @@
             this.groupBox1.Size = new System.Drawing.Size(534, 347);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(6, 27);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(134, 13);
-            this.label3.TabIndex = 43;
-            this.label3.Text = "Choose Default Encoding: ";
-            // 
-            // encodingListComboBox
-            // 
-            this.encodingListComboBox.FormattingEnabled = true;
-            this.encodingListComboBox.Location = new System.Drawing.Point(151, 22);
-            this.encodingListComboBox.Name = "encodingListComboBox";
-            this.encodingListComboBox.Size = new System.Drawing.Size(171, 21);
-            this.encodingListComboBox.TabIndex = 42;
             // 
             // lnkSplitOutFolder
             // 
@@ -328,8 +307,6 @@
         private System.ComponentModel.BackgroundWorker bgWorker2;
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.ComboBox encodingListComboBox;
         private System.Windows.Forms.LinkLabel lnkSplitOutFolder;
         private System.Windows.Forms.CheckBox chkHTML;
         private System.Windows.Forms.GroupBox groupBox2;

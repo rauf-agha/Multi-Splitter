@@ -19,7 +19,6 @@ namespace Splitter
 {
     public partial class SplitterLoader : Form
     {
-        private Dictionary<string, int> m_encodingList;
         private bool isHTMLRTL = false;
         private string[] m_sections;
         string m_fileExtension = "txt";
@@ -49,48 +48,8 @@ namespace Splitter
             InitializeComponent();
 
             LoadConfigurationSettings();
-            m_encodingList = new Dictionary<string, int>();
-
-            m_encodingList.Add("Arabic (Windows)", 1256);
-            m_encodingList.Add("Arabic (ASMO 708)", 708);
-            m_encodingList.Add("Arabic (DOS)", 720);
-            m_encodingList.Add("Arabic (ISO)", 28596);
-            m_encodingList.Add("Baltic (ISO)", 28594);
-            m_encodingList.Add("Baltic (Windows)", 1257);
-            m_encodingList.Add("Central European (DOS)", 852);
-            m_encodingList.Add("Central European (ISO)", 28592);
-            m_encodingList.Add("Central European (Windows)", 1250);
-            m_encodingList.Add("Chinese Simplified (GB18030)", 54936);
-            m_encodingList.Add("Chinese Simplified (GB2312)", 936);
-            m_encodingList.Add("Chinese Simplified (HZ)", 52936);
-            m_encodingList.Add("Chinese Traditional (Big5)", 950);
-            m_encodingList.Add("Cyrillic (DOS)", 866);
-            m_encodingList.Add("Cyrillic (ISO)", 28595);
-            m_encodingList.Add("Cyrillic (KOI8-R)", 20866);
-            m_encodingList.Add("Cyrillic (KOI8-U)", 21866);
-            m_encodingList.Add("Cyrillic (Windows)", 1251);
-            m_encodingList.Add("Greek (ISO)", 28597);
-            m_encodingList.Add("Greek (Windows)", 1253);
-            m_encodingList.Add("Hebrew (DOS)", 862);
-            m_encodingList.Add("Hebrew (ISO-Logical)", 38598);
-            m_encodingList.Add("Hebrew (ISO-Visual)", 28598);
-            m_encodingList.Add("Hebrew (Windows)", 1255);
-            m_encodingList.Add("Japanese (EUC)", 51932);
-            m_encodingList.Add("Japanese (Shift-JIS)", 932);
-            m_encodingList.Add("Korean", 949);
-            m_encodingList.Add("Thai (Windows)", 874);
-            m_encodingList.Add("Turkish (ISO)", 28599);
-            m_encodingList.Add("Turkish (Windows)", 1254);
-            m_encodingList.Add("Unicode (UTF-8)", 65001);
-            m_encodingList.Add("Vietnamese (Windows)", 1258);
-            m_encodingList.Add("Western European (ISO)", 28591);
-            m_encodingList.Add("Western European (Windows)", 1252);
-
-            encodingListComboBox.DataSource = new BindingSource(m_encodingList, null);
-            encodingListComboBox.DisplayMember = "Key";
-            encodingListComboBox.ValueMember = "Value";
-
         }
+
 
         private void aLLAHcomMuhammadcomToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -304,8 +263,7 @@ namespace Splitter
                     {
                         string pageLinkText = String.Format("{0}.{1}", prefixPart, m_fileExtension);
                         writerTOC.WriteLine("<a data-role='button' href='" + pageLinkText + "' rel='external' data-transition='flip' data-theme='a'> " + 
-                                                fileSectionName + "</a>");
-                        writerTOC.Close();
+                                                fileSectionName + "</a>");                        
                     }
                 }
 
@@ -318,9 +276,13 @@ namespace Splitter
                 { // only text files
                     textWriterFile.WriteLine(m_sections[sectionNumber]);
                     textWriterFile.Close();
-                }
+                }                
+            }
 
-                
+            //when all pages have been written, append bottom content for index page
+            using (StreamWriter writerTOC = new StreamWriter(TOCIndexFileName, append: true, encoding: Encoding.UTF8))
+            {
+                writerTOC.WriteLine(File.ReadAllText(@"Templates\index\index-bottom-content.txt"));
             }
         }
 
@@ -354,37 +316,33 @@ namespace Splitter
             //b. middle content section
             WriteHTMLBodyContent(textWriterHtml, TOCIndexFileName, sectionNumber, subSections);
 
-
-
+            
             //c. bottom section
             if (sectionNumber != 0)
             {
                 textWriterHtml.WriteLine("</body></html>");
-            }
-            else //index file
-            {
-                textWriterHtml.WriteLine(File.ReadAllText(@"Templates\index\index-bottom-content.txt"));
-            }
+            }           
             
             textWriterHtml.Close();
         }
 
-        private static void WriteHTMLBodyContent(TextWriter tr, string TOCIndexFileName, int sectionNumber, string[] subSections)
+        private static void WriteHTMLBodyContent(TextWriter writer, string TOCIndexFileName, int sectionNumber, string[] subSections)
         {
-            tr.WriteLine("<a href='" + Path.GetFileName(TOCIndexFileName) + "'>Home</a> <br/>"); // Link to Home- TOC file at top
-            tr.WriteLine("<h1>" + subSections[0] + "</h1>");
+            writer.WriteLine("<a href='" + Path.GetFileName(TOCIndexFileName) + "'>Home</a> <br/>"); // Link to Home- TOC file at top
+            writer.WriteLine("<h1>" + subSections[0] + "</h1>");
 
             //skip first line, that is a header
             for (int i = 1; i < subSections.Length; i++)
             {
                 if (!String.IsNullOrWhiteSpace(subSections[i]))
                 {
-                    tr.WriteLine("<p>" + subSections[i] + "</p>");
+                    writer.WriteLine("<p>" + subSections[i] + "</p>");
                 }              
             }
 
             if (sectionNumber != 0)
-                tr.WriteLine("<br/> <a href='" + Path.GetFileName(TOCIndexFileName) + "'>Home</a> <br/>"); // Link to Home- TOC file at bottom
+                // Link to Home- TOC file at bottom           
+                writer.WriteLine("<br/> <a href='" + Path.GetFileName(TOCIndexFileName) + "'>Home</a> <br/>"); 
         }
 
         private string CleanFileName(string fileName, string languageName)
