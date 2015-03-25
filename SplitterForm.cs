@@ -352,7 +352,7 @@ namespace Splitter
             var sb = new StringBuilder();
             foreach (char c in fileName)
             {
-                if (Char.IsLetter(c) || char.IsWhiteSpace(c))
+                if (Char.IsLetterOrDigit(c) || char.IsWhiteSpace(c))
                 {
                     sb.Append(c);
                 }
