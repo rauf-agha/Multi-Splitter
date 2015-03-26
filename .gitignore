@@ -225,3 +225,4 @@ $RECYCLE.BIN/
 *.msi
 *.msm
 *.msp
+/bin/Debug/Splitter.vshost.exe.config

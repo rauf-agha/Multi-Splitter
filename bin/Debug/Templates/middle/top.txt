@@ -1,0 +1,56 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<meta name="format-detection" content="telephone=no" />
+<meta name="msapplication-tap-highlight" content="no" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, target-densitydpi=medium-dpi, user-scalable=0" />
+<link rel="stylesheet" type="text/css" href="css/jquery.mobile.flatui.css" />
+<script type="text/javascript" src="js/jquery-1.4.2.min.js"></script>
+<link rel="stylesheet" type="text/css" href="css/style.css">
+<style type='text/css'>
+html, body {
+margin: 0;
+height: 100%;
+}
+.transbox
+{width:80%;
+margin-left: auto;
+margin-right: auto;
+background-color:#ffffff; 
+opacity:0.7;filter:alpha(opacity=80);
+text-align:center;
+padding:20px}
+p{
+text-align:justify;
+text-justify:trim;
+direction: rtl;
+color:black
+padding:5px;
+}
+b{color :black;}
+h4{color :#2980b9;
+font-size : 22px;
+text-align:justify;
+text-justify:trim;
+direction: rtl;
+}
+h2{color :#2980b9;
+}
+</style>
+<title>Muhammad.com collection of 109 languages</title>
+</head>
+<body> 
+<div data-role="page" id="aboutBook">
+<div data-role="header" data-theme="a">
+<!--<a href="index.html#main" data-role="button" rel="external" data-icon="home" data-iconpos="notext" data-theme="b" data-inline="true"></a>-->
+<a data-role="button" data-icon="plus" data-iconpos="notext" data-theme="a" onclick="resizeText(1)" data-inline="true"></a>
+<h1>Muhammad.com collection of 109 languages</h1>
+<a data-role="button" data-icon="minus" data-iconpos="notext" data-theme="a" onclick="resizeText(-1)" data-inline="true"></a> 
+</div>
+<div data-role="content" class="content">
+<!------------------>
+<div class="transbox">
+<ul data-role="listview" data-inset="true">
+<li data-role="list-divider" data-theme="a"><span class="center">current selection in your language</span></li>
+</ul>

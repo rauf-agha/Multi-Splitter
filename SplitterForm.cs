@@ -282,51 +282,44 @@ namespace Splitter
             //when all pages have been written, append bottom content for index page
             using (StreamWriter writerTOC = new StreamWriter(TOCIndexFileName, append: true, encoding: Encoding.UTF8))
             {
-                writerTOC.WriteLine(File.ReadAllText(@"Templates\index\index-bottom-content.txt"));
+                writerTOC.WriteLine(File.ReadAllText("Templates\\index\\bottom.txt"));
             }
         }
 
         private void WriteHTMLStructure(TextWriter textWriterHtml, string TOCIndexFileName, int sectionNumber, string[] subSections)
         {
-            
             //a. top section
-            if (sectionNumber == 0) //index file
+            string folderName;
+            switch (sectionNumber)
             {
-                textWriterHtml.WriteLine(File.ReadAllText(@"Templates\index\index-top-content.txt"));
+                case 0: //index page
+                    folderName = "index";
+                    break;
+
+                case 1: // page 1
+                    folderName = "first";                    
+                    break;
+
+                default://all the rest of the pages
+                    folderName = "middle";
+                    break;
             }
-            else
-            {
-                //normal pages, TBD according to template
-                if (isHTMLRTL)
-                {
-                    textWriterHtml.Write(@"<html dir=""rtl"">");
-                }
-                else
-                {
-                    textWriterHtml.Write("<html>");
-                }
-                textWriterHtml.WriteLine(@"<head> 
-                                           <meta content=""text/html; charset=UTF-8"" http-equiv=""content-type"">
-                                           <meta name=""viewport"" content=""width=device-width, initial-scale=1, maximum-scale=1"">
-                                           <title>Muhammad.com</title>
-                                    </head>
-                                    <body>");
-            }
+            textWriterHtml.WriteLine(File.ReadAllText("Templates\\" + folderName + "\\top.txt"));
 
             //b. middle content section
-            WriteHTMLBodyContent(textWriterHtml, TOCIndexFileName, sectionNumber, subSections);
+            WriteHTMLBodyContent(textWriterHtml, TOCIndexFileName, sectionNumber, subSections, folderName);
 
             
             //c. bottom section
             if (sectionNumber != 0)
             {
-                textWriterHtml.WriteLine("</body></html>");
+                textWriterHtml.WriteLine(File.ReadAllText("Templates\\" + folderName + "\\bottom.txt"));
             }           
             
             textWriterHtml.Close();
         }
 
-        private static void WriteHTMLBodyContent(TextWriter writer, string TOCIndexFileName, int sectionNumber, string[] subSections)
+        private static void WriteHTMLBodyContent(TextWriter writer, string TOCIndexFileName, int sectionNumber, string[] subSections, string folderName)
         {
             writer.WriteLine("<a href='" + Path.GetFileName(TOCIndexFileName) + "'>Home</a> <br/>"); // Link to Home- TOC file at top
             writer.WriteLine("<h1>" + subSections[0] + "</h1>");
@@ -336,7 +329,16 @@ namespace Splitter
             {
                 if (!String.IsNullOrWhiteSpace(subSections[i]))
                 {
-                    writer.WriteLine("<p>" + subSections[i] + "</p>");
+                    if (sectionNumber == 0)
+                    {
+                        writer.WriteLine("<p>" + subSections[i] + "</p>"); // TBD make it read from template file as well
+                    }
+                    else
+                    {
+                        string mainContentFilePath = "Templates\\" + folderName + "\\content.txt";
+                        writer.WriteLine(String.Format(File.ReadAllText(mainContentFilePath), subSections[i])); // e.g. <p>{0}</p>
+                    }
+                    
                 }              
             }
 
@@ -372,26 +374,3 @@ namespace Splitter
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
