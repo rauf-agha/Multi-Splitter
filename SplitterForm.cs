@@ -321,7 +321,6 @@ namespace Splitter
 
         private static void WriteHTMLBodyContent(TextWriter writer, string TOCIndexFileName, int sectionNumber, string[] subSections, string folderName)
         {
-            writer.WriteLine("<a href='" + Path.GetFileName(TOCIndexFileName) + "'>Home</a> <br/>"); // Link to Home- TOC file at top
             writer.WriteLine("<h1>" + subSections[0] + "</h1>");
 
             //skip first line, that is a header
@@ -340,11 +339,7 @@ namespace Splitter
                     }
                     
                 }              
-            }
-
-            if (sectionNumber != 0)
-                // Link to Home- TOC file at bottom           
-                writer.WriteLine("<br/> <a href='" + Path.GetFileName(TOCIndexFileName) + "'>Home</a> <br/>"); 
+            }            
         }
 
         private string CleanFileName(string fileName, string languageName)
