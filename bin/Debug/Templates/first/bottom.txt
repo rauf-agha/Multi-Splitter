@@ -3,7 +3,7 @@
 <div data-role="navbar" data-theme="a">
 <ul> 
 <li><a href="index.html#main" class="center" data-role="button" rel="external" data-transition="flip" data-icon="home" data-iconpos="notext" data-theme="a" data-inline="true">main الرئيسية</a></li>
-<li><a href="page2.html" rel="external" data-icon="forward" data-iconpos="top" data-transition="flip" data-theme="a">next التالي</a></li>
+<li><a href="page2.htm" rel="external" data-icon="forward" data-iconpos="top" data-transition="flip" data-theme="a">next التالي</a></li>
 </ul>
 </div><!-- /navbar -->
 </div>

@@ -306,14 +306,19 @@ namespace Splitter
             }
             textWriterHtml.WriteLine(File.ReadAllText("Templates\\" + folderName + "\\top.txt"));
 
-            //b. middle content section
+            //b. content section
             WriteHTMLBodyContent(textWriterHtml, TOCIndexFileName, sectionNumber, subSections, folderName);
 
             
             //c. bottom section
             if (sectionNumber != 0)
             {
-                textWriterHtml.WriteLine(File.ReadAllText("Templates\\" + folderName + "\\bottom.txt"));
+                //replace dynamic template variables
+                string bottomText = File.ReadAllText("Templates\\" + folderName + "\\bottom.txt");
+                bottomText = bottomText.Replace("{PREVIOUS_PAGE}", m_fileNamePrefix + (sectionNumber-1) + "." + m_fileExtension);
+                bottomText = bottomText.Replace("{NEXT_PAGE}", m_fileNamePrefix + (sectionNumber + 1) + "." + m_fileExtension);
+
+                textWriterHtml.WriteLine(bottomText);
             }           
             
             textWriterHtml.Close();
