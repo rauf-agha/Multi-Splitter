@@ -316,7 +316,15 @@ namespace Splitter
                 //replace dynamic template variables
                 string bottomText = File.ReadAllText("Templates\\" + folderName + "\\bottom.txt");
                 bottomText = bottomText.Replace("{PREVIOUS_PAGE}", m_fileNamePrefix + (sectionNumber-1) + "." + m_fileExtension);
-                bottomText = bottomText.Replace("{NEXT_PAGE}", m_fileNamePrefix + (sectionNumber + 1) + "." + m_fileExtension);
+                if (sectionNumber < m_sections.Length - 1)
+                {
+                    bottomText = bottomText.Replace("{NEXT_PAGE}", m_fileNamePrefix + (sectionNumber + 1) + "." + m_fileExtension);   
+                }
+                else
+                {
+                    bottomText = bottomText.Replace("{NEXT_PAGE}", "");   
+                }
+                
 
                 textWriterHtml.WriteLine(bottomText);
             }           
