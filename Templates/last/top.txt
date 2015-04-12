@@ -69,5 +69,6 @@ h2{color :#2980b9;
 
       <ul data-role="listview" data-inset="true">
         <li data-role="list-divider"  data-theme="a"><span class="center">current selection in your language</span></li>
-		</ul>
-<h3>current selection in your language</h3>
+	  </ul>
+
+<h3>{header}</h3>

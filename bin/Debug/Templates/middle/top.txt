@@ -45,7 +45,9 @@ h2{color :#2980b9;
 <div data-role="header" data-theme="a">
 <!--<a href="index.html#main" data-role="button" rel="external" data-icon="home" data-iconpos="notext" data-theme="b" data-inline="true"></a>-->
 <a data-role="button" data-icon="plus" data-iconpos="notext" data-theme="a" onclick="resizeText(1)" data-inline="true"></a>
-<h1>Muhammad.com collection of 109 languages</h1>
+
+<h1>{header}</h1>
+
 <a data-role="button" data-icon="minus" data-iconpos="notext" data-theme="a" onclick="resizeText(-1)" data-inline="true"></a> 
 </div>
 <div data-role="content" class="content">

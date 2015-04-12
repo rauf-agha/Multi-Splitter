@@ -25,6 +25,7 @@ namespace Splitter
         String m_htmlExtension, m_inputFolder, m_outputFolder, m_fileNamePrefix,
                 m_splitCharacter, m_staticFolder, m_IndexFileName;
         int m_LineCountToCombine;
+        String m_bookTitle = "";
 
         private void SplitterLoader_Load(object sender, EventArgs e)
         {
@@ -234,8 +235,8 @@ namespace Splitter
                 //subSections[0] only will be used for naming file
                 string[] subSections = m_sections[sectionNumber].Split(new char[] { '\r', '\n' });
 
-                string fileSectionName = CleanFileName(subSections[0], bookLanguageName);                
-
+                string fileSectionName = CleanFileName(subSections[0], bookLanguageName);
+               
                 string prefixPart = m_fileNamePrefix + sectionNumber; //e.g. page1                
                 String outputBookFolder = Path.Combine(m_outputFolder, bookLanguageName, bookName);
                 if (!Directory.Exists(outputBookFolder))
@@ -256,6 +257,9 @@ namespace Splitter
                 if (sectionNumber == 0) // save TOC (index) file name
                 {
                     TOCIndexFileName = outFileNamePath;
+
+                    //also set {header} value
+                    m_bookTitle = fileSectionName;
                 }
                 else // append topic file names and page links in the TOC (index) file
                 {
@@ -285,7 +289,7 @@ namespace Splitter
                 writerTOC.WriteLine(File.ReadAllText("Templates\\index\\bottom.txt"));
             }
         }
-
+     
         private void WriteHTMLStructure(TextWriter textWriterHtml, string TOCIndexFileName, int sectionNumber, string[] subSections)
         {
             //a. top section
@@ -304,12 +308,13 @@ namespace Splitter
                     folderName = "middle";
                     break;
             }
-            textWriterHtml.WriteLine(File.ReadAllText("Templates\\" + folderName + "\\top.txt"));
+            String topText = File.ReadAllText("Templates\\" + folderName + "\\top.txt");
+            topText = topText.Replace("{header}", m_bookTitle);
+            textWriterHtml.WriteLine(topText);
 
             //b. content section
             WriteHTMLBodyContent(textWriterHtml, TOCIndexFileName, sectionNumber, subSections, folderName);
-
-            
+                        
             //c. bottom section
             if (sectionNumber != 0)
             {
