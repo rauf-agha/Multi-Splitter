@@ -38,7 +38,7 @@ direction: rtl;
 h2{color :#2980b9;
 }
 </style>
-<title>Muhammad.com collection in 109 languages</title>
+<title>{header}</title>
 </head>
 <body> 
 <div data-role="page" id="aboutBook">
@@ -54,4 +54,4 @@ h2{color :#2980b9;
 <ul data-role="listview" data-inset="true">
 <li data-role="list-divider" data-theme="a"><span class="center">current selection in your language</span></li>
 </ul>
-<h3> current selection in your language</h3>
+<h3>{header}</h3>

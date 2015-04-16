@@ -45,7 +45,7 @@ direction: rtl;
 h2{color :#2980b9;
 }
   </style>
-        <title>Muhammad.com collection in 109 languages</title>
+        <title>{header}</title>
     </head>
 
 <body> 

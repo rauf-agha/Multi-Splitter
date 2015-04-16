@@ -33,7 +33,7 @@
 			}
 		</style>
 
-		<title>Table of Contents</title>
+		<title>{header}</title>
 	</head>
 
 	<body> 

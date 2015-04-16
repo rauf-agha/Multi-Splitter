@@ -103,31 +103,37 @@ namespace Splitter
             m_sections = wholeFileText.Split(new string[] { m_splitCharacter }, StringSplitOptions.RemoveEmptyEntries);
             
             //if no splitter character is found in the book then combine N lines and make one section (page) out of it
-            if (m_sections.Length <= 1)
+            if (m_sections.Length <= 2)
             {
-                // clear memory
-                wholeFileText = ""; 
-                Array.Clear(m_sections, 0, m_sections.Length);
-
-                var sections = new List<string>();
-                
-                String[] lines = File.ReadAllLines(bookFileName, Encoding.UTF8);
-                var combinedLines = new StringBuilder();
-                for (int i = 0; i < lines.Length; i++)
-                {
-                    //once N lines are read, save them as one section in sections LIST<string>
-                    if ((i + 1) % (m_LineCountToCombine + 1) == 0)
-                    {
-                        sections.Add(combinedLines.ToString());
-                        combinedLines.Clear();
-                    }
-                    else
-                    {
-                        combinedLines.AppendLine(lines[i]);
-                    }
-                }
-                m_sections = sections.ToArray();
+                wholeFileText = WhenSplitterCharacterIsMissingCombineNLines(bookFileName, wholeFileText, m_LineCountToCombine);
             }
+        }
+
+        private string WhenSplitterCharacterIsMissingCombineNLines(string bookFileName, String wholeFileText, int linesToCombine)
+        {
+            // clear memory
+            wholeFileText = "";
+            Array.Clear(m_sections, 0, m_sections.Length);
+
+            var sections = new List<string>();
+
+            String[] lines = File.ReadAllLines(bookFileName, Encoding.UTF8);
+            var combinedLines = new StringBuilder();
+            for (int i = 0; i < lines.Length; i++)
+            {
+                //once N lines are read, save them as one section in sections LIST<string>
+                if ((i + 1) % (linesToCombine + 1) == 0)
+                {
+                    sections.Add(combinedLines.ToString());
+                    combinedLines.Clear();
+                }
+                else
+                {
+                    combinedLines.AppendLine(lines[i]);
+                }
+            }
+            m_sections = sections.ToArray();
+            return wholeFileText;
         }
 
 
@@ -184,12 +190,13 @@ namespace Splitter
 
         private void CopyAllStaticFoldersAndFiles(string sourceFolder, string destinationFolder)
         {
-            Process proc = new Process();
-            proc.StartInfo.UseShellExecute = true;
-            proc.StartInfo.FileName = Path.Combine(Environment.SystemDirectory, "xcopy.exe");
-            proc.StartInfo.Arguments = "\"" + sourceFolder + "\"  \"" + destinationFolder + "\"  /E /I /R /Y /Q";  //"C:\source folder"  "C:\destination folder"  /E /I";
-            proc.Start();
-            proc.Close();
+            using (Process proc = new Process())
+            {
+                proc.StartInfo.UseShellExecute = true;
+                proc.StartInfo.FileName = Path.Combine(Environment.SystemDirectory, "xcopy.exe");
+                proc.StartInfo.Arguments = "\"" + sourceFolder + "\"  \"" + destinationFolder + "\"  /E /I /R /Y /Q";  //"C:\source folder"  "C:\destination folder"  /E /I";
+                proc.Start();
+            }
         }
 
         private void GeneratePagesFromBookFile(string bookFileName, string bookLanguage)
@@ -284,7 +291,7 @@ namespace Splitter
             }
 
             //when all pages have been written, append bottom content for index page
-            using (StreamWriter writerTOC = new StreamWriter(TOCIndexFileName, append: true, encoding: Encoding.UTF8))
+            using (var writerTOC = new StreamWriter(TOCIndexFileName, append: true, encoding: Encoding.UTF8))
             {
                 writerTOC.WriteLine(File.ReadAllText("Templates\\index\\bottom.txt"));
             }
@@ -320,7 +327,10 @@ namespace Splitter
             {
                 //replace dynamic template variables
                 string bottomText = File.ReadAllText("Templates\\" + folderName + "\\bottom.txt");
+                bottomText = bottomText.Replace("{CURRENT_PAGE}", sectionNumber.ToString());
+
                 bottomText = bottomText.Replace("{PREVIOUS_PAGE}", m_fileNamePrefix + (sectionNumber-1) + "." + m_fileExtension);
+                
                 if (sectionNumber < m_sections.Length - 1)
                 {
                     bottomText = bottomText.Replace("{NEXT_PAGE}", m_fileNamePrefix + (sectionNumber + 1) + "." + m_fileExtension);   
@@ -339,23 +349,29 @@ namespace Splitter
 
         private static void WriteHTMLBodyContent(TextWriter writer, string TOCIndexFileName, int sectionNumber, string[] subSections, string folderName)
         {
-            writer.WriteLine("<h1>" + subSections[0] + "</h1>");
+            writer.WriteLine("<h1>" + subSections[0] + "</h1>"); // use [0] as header
 
-            //skip first line, that is a header
+            string mainContentFilePath = "Templates\\" + folderName + "\\content.txt";
+            string contentFileData = "";
+
+            if (sectionNumber > 0) //content.txt does not exist for index file or folder
+            {
+                contentFileData = File.ReadAllText(mainContentFilePath);    
+            }            
+
+            //starting from 1 instead of 0, skip first line, that is a header
             for (int i = 1; i < subSections.Length; i++)
             {
                 if (!String.IsNullOrWhiteSpace(subSections[i]))
                 {
                     if (sectionNumber == 0)
                     {
-                        writer.WriteLine("<p>" + subSections[i] + "</p>"); // TBD make it read from template file as well
+                        writer.WriteLine("<p>" + subSections[i] + "</p>"); 
                     }
                     else
                     {
-                        string mainContentFilePath = "Templates\\" + folderName + "\\content.txt";
-                        writer.WriteLine(String.Format(File.ReadAllText(mainContentFilePath), subSections[i])); // e.g. <p>{0}</p>
-                    }
-                    
+                        writer.WriteLine(String.Format(contentFileData, subSections[i])); // e.g. <p>{0}</p>
+                    }                    
                 }              
             }            
         }
