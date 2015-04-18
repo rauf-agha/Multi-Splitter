@@ -343,6 +343,7 @@ namespace Splitter
         {
             //replace dynamic template variables
             string bottomText = File.ReadAllText("Templates\\" + folderName + "\\bottom.txt");
+            bottomText = bottomText.Replace("{header}", m_bookTitle);
             bottomText = bottomText.Replace("{CURRENT_PAGE}", sectionNumber.ToString());
             bottomText = bottomText.Replace("{BOOK_NAME}", bookName);
 
