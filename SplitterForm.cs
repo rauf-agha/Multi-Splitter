@@ -280,7 +280,7 @@ namespace Splitter
 
                 if (chkHTML.Checked)
                 {
-                    WriteHTMLStructure(textWriterFile, TOCIndexFileName, sectionNumber, subSections);
+                    WriteHTMLStructure(textWriterFile, TOCIndexFileName, sectionNumber, subSections ,bookName);
                 }
 
                 else
@@ -297,9 +297,8 @@ namespace Splitter
             }
         }
      
-        private void WriteHTMLStructure(TextWriter textWriterHtml, string TOCIndexFileName, int sectionNumber, string[] subSections)
+        private void WriteHTMLStructure(TextWriter textWriterHtml, string TOCIndexFileName, int sectionNumber, string[] subSections, string bookName)
         {
-            //a. top section
             string folderName;
             switch (sectionNumber)
             {
@@ -308,16 +307,16 @@ namespace Splitter
                     break;
 
                 case 1: // page 1
-                    folderName = "first";                    
+                    folderName = "first";
                     break;
 
                 default://all the rest of the pages
                     folderName = "middle";
                     break;
             }
-            String topText = File.ReadAllText("Templates\\" + folderName + "\\top.txt");
-            topText = topText.Replace("{header}", m_bookTitle);
-            textWriterHtml.WriteLine(topText);
+
+            //a. top section
+            FillTopSection(textWriterHtml, sectionNumber, bookName, folderName);
 
             //b. content section
             WriteHTMLBodyContent(textWriterHtml, TOCIndexFileName, sectionNumber, subSections, folderName);
@@ -325,26 +324,40 @@ namespace Splitter
             //c. bottom section
             if (sectionNumber != 0)
             {
-                //replace dynamic template variables
-                string bottomText = File.ReadAllText("Templates\\" + folderName + "\\bottom.txt");
-                bottomText = bottomText.Replace("{CURRENT_PAGE}", sectionNumber.ToString());
-
-                bottomText = bottomText.Replace("{PREVIOUS_PAGE}", m_fileNamePrefix + (sectionNumber-1) + "." + m_fileExtension);
-                
-                if (sectionNumber < m_sections.Length - 1)
-                {
-                    bottomText = bottomText.Replace("{NEXT_PAGE}", m_fileNamePrefix + (sectionNumber + 1) + "." + m_fileExtension);   
-                }
-                else
-                {
-                    bottomText = bottomText.Replace("{NEXT_PAGE}", "");   
-                }
-                
-
-                textWriterHtml.WriteLine(bottomText);
-            }           
+                FillBottomSection(textWriterHtml, sectionNumber, bookName, folderName);
+            }         
             
             textWriterHtml.Close();
+        }
+
+        private void FillTopSection(TextWriter textWriterHtml, int sectionNumber, string bookName, string folderName)
+        {            
+            String topText = File.ReadAllText("Templates\\" + folderName + "\\top.txt");
+            topText = topText.Replace("{header}", m_bookTitle);
+            topText = topText.Replace("{CURRENT_PAGE}", sectionNumber.ToString());
+            topText = topText.Replace("{BOOK_NAME}", bookName);
+            textWriterHtml.WriteLine(topText);            
+        }
+
+        private void FillBottomSection(TextWriter textWriterHtml, int sectionNumber, string bookName, string folderName)
+        {
+            //replace dynamic template variables
+            string bottomText = File.ReadAllText("Templates\\" + folderName + "\\bottom.txt");
+            bottomText = bottomText.Replace("{CURRENT_PAGE}", sectionNumber.ToString());
+            bottomText = bottomText.Replace("{BOOK_NAME}", bookName);
+
+            bottomText = bottomText.Replace("{PREVIOUS_PAGE}", m_fileNamePrefix + (sectionNumber - 1) + "." + m_fileExtension);
+
+            if (sectionNumber < m_sections.Length - 1)
+            {
+                bottomText = bottomText.Replace("{NEXT_PAGE}", m_fileNamePrefix + (sectionNumber + 1) + "." + m_fileExtension);
+            }
+            else
+            {
+                bottomText = bottomText.Replace("{NEXT_PAGE}", "");
+            }
+
+            textWriterHtml.WriteLine(bottomText);
         }
 
         private static void WriteHTMLBodyContent(TextWriter writer, string TOCIndexFileName, int sectionNumber, string[] subSections, string folderName)
