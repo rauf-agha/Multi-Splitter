@@ -217,7 +217,7 @@ namespace Splitter
             MainBookTextProcessing(outBookName, bookLanguage);
         }
 
-        private List<String> GetListOfAllBooks(string languageFolder)
+        public List<String> GetListOfAllBooks(string languageFolder)
         {
             var bookFiles = Directory.GetFiles(languageFolder).ToList();
             bookFiles.Sort();
@@ -363,8 +363,7 @@ namespace Splitter
 
         private static void WriteHTMLBodyContent(TextWriter writer, string TOCIndexFileName, int sectionNumber, string[] subSections, string folderName)
         {
-            writer.WriteLine("<h1>" + subSections[0] + "</h1>"); // use [0] as header
-
+            //writer.WriteLine("<h1>" + subSections[0] + "</h1>"); // use [0] as header , now not needed by ldap
             string mainContentFilePath = "Templates\\" + folderName + "\\content.txt";
             string contentFileData = "";
 
